@@ -3,10 +3,9 @@
 
 import asyncio
 import random
-import typing
 
 
-async def async_generator() -> None: # type: ignore
+async def async_generator():
     '''Asynchronous generator that yields a random number'''
     for _ in range(10):
         await asyncio.sleep(1)
