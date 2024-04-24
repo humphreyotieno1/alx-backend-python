@@ -6,7 +6,7 @@ import random
 import typing
 
 
-async def async_generator() -> typing.Iterator[float]: # type: ignore
+async def async_generator() -> typing.AsyncGenerator[float, None, None]:
     '''Asynchronous generator that yields a random number'''
     for _ in range(10):
         await asyncio.sleep(1)
