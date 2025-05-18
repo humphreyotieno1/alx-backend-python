@@ -28,7 +28,7 @@ def paginate_users(page_size, offset):
     try:
         connection = connect_to_prodev()
         if not connection:
-            raise []
+            return []
 
         cursor = connection.cursor(dictionary=True)
         cursor.execute(f"SELECT * FROM user_data LIMIT {page_size} OFFSET {offset}")
