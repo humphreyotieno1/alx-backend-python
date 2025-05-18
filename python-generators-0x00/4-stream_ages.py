@@ -44,3 +44,22 @@ def stream_user_ages():
             cursor.close()
         if connection:
             connection.close()
+            
+# find the average age of users
+def calculate_average_age():
+    total_age = 0
+    count = 0
+    for age in stream_user_ages():
+        total_age += age
+        count += 1
+    if count == 0:
+        return 0.0
+    
+    return total_age / count
+
+if __name__ == "__main__":
+    try:
+        average_age = calculate_average_age()
+        print(f"Average age of users: {average_age}")
+    except BrokenPipeError:
+        sys.stderr.close()
