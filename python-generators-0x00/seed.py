@@ -3,6 +3,7 @@ import uuid
 import mysql.connector
 from mysql.connector import Error
 import os
+from dotenv import load_dotenv
 
 # connecting to the database
 def connect_db():
@@ -10,7 +11,7 @@ def connect_db():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password=os.env.DB_PASSWORD
+            password=os.environ.get('DB_PASSWORD')
         )
         return connection
     except Error as e:
@@ -22,7 +23,7 @@ def create_database(connection):
     try:
         cursor = connection.cursor()
         cursor.execute("CREATE DATABASE IF NOT EXISTS ALX_prodev")
-        print("Dtabase created successfully")
+        print("Database created successfully")
     except Error as e:
         print(f"Error creating database: {e}")
     finally:
@@ -35,7 +36,7 @@ def connect_to_prodev():
         connection = mysql.connector.connect(
             host='localhost',
             user='root',
-            password=os.env.DB_PASSWORD,
+            password=os.environ.get('DB_PASSWORD'),
             database='ALX_prodev'
         )
         return connection
@@ -84,3 +85,56 @@ def insert_data(connection, data):
     finally:
         if cursor:
             cursor.close()
+            
+def main():
+    # Load environment variables from .env file
+    load_dotenv()
+    
+    # Connect to MySQL server
+    connection = connect_db()
+    if not connection:
+        print("Failed to connect to MySQL server. Exiting...")
+        return
+    
+    # Create database
+    create_database(connection)
+    connection.close()
+    
+    # Connect to the ALX_prodev database
+    prodev_connection = connect_to_prodev()
+    if not prodev_connection:
+        print("Failed to connect to ALX_prodev database. Exiting...")
+        return
+    
+    # Create table
+    create_table(prodev_connection)
+    
+    # Read data from CSV file (if available) or create sample data
+    try:
+        data = []
+        csv_file = 'user_data.csv'
+        
+        if os.path.exists(csv_file):
+            with open(csv_file, 'r') as file:
+                csv_reader = csv.DictReader(file)
+                for row in csv_reader:
+                    data.append({
+                        'user_id': row.get('user_id', str(uuid.uuid4())),
+                        'name': row['name'],
+                        'email': row['email'],
+                        'age': row['age']
+                    })
+        else:
+            print(f"CSV file {csv_file} not found. Generating sample data.")
+        
+        # Insert data
+        insert_data(prodev_connection, data)
+    except Exception as e:
+        print(f"Error processing data: {e}")
+    finally:
+        if prodev_connection:
+            prodev_connection.close()
+            print("Database connection closed")
+
+if __name__ == "__main__":
+    main()
