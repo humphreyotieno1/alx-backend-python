@@ -87,29 +87,29 @@ def insert_data(connection, data):
             cursor.close()
             
 def main():
-    # Load environment variables from .env file
+    # load environment variables from .env file
     load_dotenv()
     
-    # Connect to MySQL server
+    # connect to MySQL server
     connection = connect_db()
     if not connection:
         print("Failed to connect to MySQL server. Exiting...")
         return
     
-    # Create database
+    # create database
     create_database(connection)
     connection.close()
     
-    # Connect to the ALX_prodev database
+    # connect to the ALX_prodev database
     prodev_connection = connect_to_prodev()
     if not prodev_connection:
         print("Failed to connect to ALX_prodev database. Exiting...")
         return
     
-    # Create table
+    # create table
     create_table(prodev_connection)
     
-    # Read data from CSV file (if available) or create sample data
+    # read data from CSV file
     try:
         data = []
         csv_file = 'user_data.csv'
@@ -127,7 +127,7 @@ def main():
         else:
             print(f"CSV file {csv_file} not found. Generating sample data.")
         
-        # Insert data
+        # insert data
         insert_data(prodev_connection, data)
     except Exception as e:
         print(f"Error processing data: {e}")
