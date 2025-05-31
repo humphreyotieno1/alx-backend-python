@@ -66,10 +66,10 @@ class TestGithubOrgClient(unittest.TestCase):
         # Configure get_json mock
         mock_get_json.return_value = test_repos_payload
 
-        # Patch _public_repos_url property
+        # Create a mock for the property
         with patch('client.GithubOrgClient._public_repos_url',
                 new_callable=PropertyMock,
-                return_value=test_repos_url):
+                return_value=test_repos_url) as mock_public_repos_url:
             # Create client instance
             client = GithubOrgClient("testorg")
 
@@ -79,4 +79,4 @@ class TestGithubOrgClient(unittest.TestCase):
 
             # Verify mocks were called
             mock_get_json.assert_called_once_with(test_repos_url)
-            client._public_repos_url.assert_called_once()
+            mock_public_repos_url.assert_called_once()
