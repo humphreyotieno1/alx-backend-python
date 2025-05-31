@@ -94,6 +94,20 @@ class TestGithubOrgClient(unittest.TestCase):
 
 @parameterized_class(('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'), 
                     TEST_PAYLOADS)
+@parameterized_class([
+    {
+        'org_payload': TEST_PAYLOADS[0][0],
+        'repos_payload': TEST_PAYLOADS[0][1],
+        'expected_repos': TEST_PAYLOADS[0][2],
+        'apache2_repos': TEST_PAYLOADS[0][3],
+    },
+    {
+        'org_payload': TEST_PAYLOADS[1][0],
+        'repos_payload': TEST_PAYLOADS[1][1],
+        'expected_repos': TEST_PAYLOADS[1][2],
+        'apache2_repos': TEST_PAYLOADS[1][3],
+    }
+])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration test class for GithubOrgClient"""
 
