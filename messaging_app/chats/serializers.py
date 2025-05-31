@@ -14,6 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     sender_name = serializers.SerializerMethodField()
+    # Add a CharField with validation
+    text = serializers.CharField(max_length=500, required=True)
     
     class Meta:
         model = Message
@@ -23,32 +25,11 @@ class MessageSerializer(serializers.ModelSerializer):
     
     def get_sender_name(self, obj):
         return obj.sender.username
-
-
-class ConversationListSerializer(serializers.ModelSerializer):
-    participants = UserSerializer(many=True, read_only=True)
-    last_message = serializers.SerializerMethodField()
     
-    class Meta:
-        model = Conversation
-        fields = ('conversation_id', 'participants', 'created_at', 'updated_at', 'last_message')
-        read_only_fields = ('conversation_id', 'created_at', 'updated_at')
-    
-    def get_last_message(self, obj):
-        message = obj.messages.order_by('-sent_at').first()
-        if message:
-            return MessageSerializer(message).data
-        return None
-
-
-class ConversationDetailSerializer(serializers.ModelSerializer):
-    participants = UserSerializer(many=True, read_only=True)
-    messages = MessageSerializer(many=True, read_only=True)
-    
-    class Meta:
-        model = Conversation
-        fields = ('conversation_id', 'participants', 'created_at', 'updated_at', 'messages')
-        read_only_fields = ('conversation_id', 'created_at', 'updated_at')
+    def validate_text(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Message text cannot be empty.")
+        return value
 
 
 class ConversationCreateSerializer(serializers.ModelSerializer):
@@ -61,3 +42,8 @@ class ConversationCreateSerializer(serializers.ModelSerializer):
         model = Conversation
         fields = ('conversation_id', 'participants')
         read_only_fields = ('conversation_id',)
+    
+    def validate_participants(self, value):
+        if len(value) < 2:
+            raise serializers.ValidationError("Conversation must have at least 2 participants.")
+        return value
