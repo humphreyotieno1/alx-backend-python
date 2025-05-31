@@ -77,8 +77,8 @@ class TestMemoize(unittest.TestCase):
 
         # Create instance and mock a_method
         test_instance = TestClass()
-    
-        with patch.object(TestClass, 'a_method', return_value=42)as mocked_method:
+
+        with patch.object(TestClass,'a_method',return_value=42)as mocked_method:
             # First call - should call a_method
             result1 = test_instance.a_property
             # Second call - should use cache
