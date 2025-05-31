@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status, permissions, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import Conversation, Message
 from .serializers import (
     ConversationCreateSerializer,
@@ -16,6 +17,10 @@ class ConversationViewSet(viewsets.ModelViewSet):
     """
     queryset = Conversation.objects.all()
     serializer_class = ConversationCreateSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['conversation_id', 'created_at']
+    search_fields = ['title']
+    ordering_fields = ['created_at', 'updated_at']
     
     def get_queryset(self):
         # Filter conversations to only show those the user is participating in
@@ -50,6 +55,10 @@ class MessageViewSet(viewsets.ReadOnlyModelViewSet):
     ViewSet for viewing messages
     """
     serializer_class = MessageSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['message_id', 'sender', 'created_at']
+    search_fields = ['content']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         # Get the conversation ID from the URL parameter
