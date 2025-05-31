@@ -4,7 +4,7 @@ import unittest
 from parameterized import parameterized, parameterized_class
 from unittest.mock import patch, PropertyMock, Mock
 from client import GithubOrgClient
-from fixtures import TEST_PAYLOADS
+from fixtures import TEST_PAYLOAD
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -93,7 +93,7 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, expected)
 
 @parameterized_class(('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'), 
-                    TEST_PAYLOADS)
+                    TEST_PAYLOAD)
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """Integration test class for GithubOrgClient"""
 
@@ -132,16 +132,16 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
 @parameterized_class([
     {
-        'org_payload': TEST_PAYLOADS[0][0],
-        'repos_payload': TEST_PAYLOADS[0][1],
-        'expected_repos': TEST_PAYLOADS[0][2],
-        'apache2_repos': TEST_PAYLOADS[0][3],
+        'org_payload': TEST_PAYLOAD[0][0],
+        'repos_payload': TEST_PAYLOAD[0][1],
+        'expected_repos': TEST_PAYLOAD[0][2],
+        'apache2_repos': TEST_PAYLOAD[0][3],
     },
     {
-        'org_payload': TEST_PAYLOADS[1][0],
-        'repos_payload': TEST_PAYLOADS[1][1],
-        'expected_repos': TEST_PAYLOADS[1][2],
-        'apache2_repos': TEST_PAYLOADS[1][3],
+        'org_payload': TEST_PAYLOAD[1][0],
+        'repos_payload': TEST_PAYLOAD[1][1],
+        'expected_repos': TEST_PAYLOAD[1][2],
+        'apache2_repos': TEST_PAYLOAD[1][3],
     }
 ])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
