@@ -2,11 +2,11 @@ from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Conversation, Message
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import ConversationCreateSerializer, MessageSerializer
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
-    serializer_class = ConversationSerializer
+    serializer_class = ConversationCreateSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'participants__username']
     ordering_fields = ['created_at', 'updated_at']
