@@ -99,17 +99,17 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Set up mock for requests.get"""
-        cls.get_patcher = patch('requests.get')
+        """Set up mock for client.get_json"""
+        cls.get_patcher = patch('client.get_json')
         cls.mock_get = cls.get_patcher.start()
 
         def get_json_side_effect(url):
             """Return different payloads based on the URL"""
-            if "orgs/" in url:
-                return Mock(json=lambda: cls.org_payload)
-            if "repos" in url:
-                return Mock(json=lambda: cls.repos_payload)
-            return Mock(json=lambda: None)
+            if url.endswith(f"/orgs/{cls.org_payload['login']}"):
+                return cls.org_payload
+            if url.endswith("/repos"):
+                return cls.repos_payload
+            return {}
 
         cls.mock_get.side_effect = get_json_side_effect
 
