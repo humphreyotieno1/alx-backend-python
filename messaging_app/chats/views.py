@@ -1,11 +1,14 @@
-from rest_framework import viewsets, status, filters, permissions
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
-from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 from .models import Conversation, Message, User
 from .serializers import ConversationCreateSerializer, MessageSerializer, UserSerializer
-from .permissions import IsParticipant, IsMessageOwner, IsOwnerOrReadOnly, IsParticipantOfConversation
+from .permissions import IsMessageOwner, IsParticipantOfConversation
+from .filters import MessageFilter
+from .pagination import MessagePagination
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -66,12 +69,37 @@ class ConversationViewSet(viewsets.ModelViewSet):
             )
 
 class MessageViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows messages to be viewed or edited.
+    """
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsMessageOwner]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['content']
-    ordering_fields = ['timestamp']
-    filterset_fields = ['conversation', 'sender', 'is_read']
+    ordering_fields = ['timestamp', 'is_read']
+    filterset_class = MessageFilter
+    pagination_class = MessagePagination
+    
+    def get_queryset(self):
+        """
+        Return messages where the current user is a participant of the conversation.
+        """
+        return Message.objects.filter(
+            conversation__participants=self.request.user
+        ).select_related('sender', 'conversation')
+    
+    def filter_queryset(self, queryset):
+        """
+        Apply all the filters to the queryset.
+        """
+        queryset = super().filter_queryset(queryset)
+        
+        # Apply additional filtering for the current user
+        conversation_id = self.request.query_params.get('conversation')
+        if conversation_id:
+            queryset = queryset.filter(conversation_id=conversation_id)
+        
+        return queryset.distinct()
     
     def get_queryset(self):
         # Only show messages from conversations the user is a participant of
