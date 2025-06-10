@@ -34,7 +34,7 @@ class IsParticipantOfConversation(BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
             
-        # For list views, we'll check object-level permissions in get_queryset
+        # For list and create actions, we'll check in the view
         if view.action in ['list', 'create']:
             return True
             
@@ -42,12 +42,19 @@ class IsParticipantOfConversation(BasePermission):
         return True
     
     def has_object_permission(self, request, view, obj):
-        # Allow safe methods (GET, HEAD, OPTIONS) for participants
+        # Check if the user is a participant of the conversation
+        is_participant = request.user in obj.participants.all()
+        
+        # For GET, HEAD, OPTIONS (safe methods)
         if request.method in SAFE_METHODS:
-            return request.user in obj.participants.all()
+            return is_participant
             
-        # For write operations, check if the user is an admin or the owner
-        return request.user == obj.creator or request.user.is_staff
+        # For PUT, PATCH, DELETE - only allow if user is participant
+        if request.method in ['PUT', 'PATCH', 'DELETE']:
+            return is_participant
+            
+        # Default deny
+        return False
 
 class IsMessageOwner(BasePermission):
     """

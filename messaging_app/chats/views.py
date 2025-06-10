@@ -78,22 +78,68 @@ class MessageViewSet(viewsets.ModelViewSet):
         return Message.objects.filter(conversation__participants=self.request.user)
     
     def perform_create(self, serializer):
+        # Get the conversation from the request data
+        conversation = serializer.validated_data.get('conversation')
+        
+        # Check if the user is a participant of the conversation
+        if conversation and self.request.user not in conversation.participants.all():
+            raise PermissionDenied({"detail": "You are not a participant of this conversation."})
+        
         # Automatically set the sender to the current user
         serializer.save(sender=self.request.user)
         
         # Update the conversation's updated_at timestamp
-        conversation = serializer.validated_data['conversation']
         conversation.save()
     
-    def get_queryset(self):
-        # Users can only see messages from conversations they are part of
-        return Message.objects.filter(
-            conversation__participants=self.request.user
-        ).select_related('sender', 'conversation')
+    def update(self, request, *args, **kwargs):
+        # Get the message object
+        message = self.get_object()
+        
+        # Check if the user is the sender of the message
+        if message.sender != request.user:
+            return Response(
+                {"detail": "You can only update your own messages."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        # Check if the user is a participant of the conversation
+        if request.user not in message.conversation.participants.all():
+            return Response(
+                {"detail": "You are not a participant of this conversation."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        return super().update(request, *args, **kwargs)
     
-    def perform_create(self, serializer):
-        # Automatically set the sender to the current user
-        serializer.save(sender=self.request.user)
+    def destroy(self, request, *args, **kwargs):
+        # Get the message object
+        message = self.get_object()
+        conversation_id = message.conversation.id
+        
+        # Check if the user is the sender of the message
+        if message.sender != request.user:
+            return Response(
+                {"detail": "You can only delete your own messages."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        # Check if the user is a participant of the conversation
+        if request.user not in message.conversation.participants.all():
+            return Response(
+                {"detail": "You are not a participant of this conversation."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
+        response = super().destroy(request, *args, **kwargs)
+        
+        # Update the conversation's updated_at timestamp after message deletion
+        try:
+            conversation = Conversation.objects.get(id=conversation_id)
+            conversation.save()
+        except Conversation.DoesNotExist:
+            pass
+            
+        return response
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
