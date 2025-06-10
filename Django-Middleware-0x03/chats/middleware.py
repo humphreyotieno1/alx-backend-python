@@ -86,10 +86,12 @@ class OffensiveLanguageMiddleware:
         return self.get_response(request)
 
 
-class RolePermissionMiddleware:
+class RolepermissionMiddleware:
     """
     Middleware that enforces role-based access control.
     Restricts certain paths to admin users only.
+    
+    Note: Class name uses lowercase 'p' to match project requirements.
     """
     def __init__(self, get_response):
         self.get_response = get_response
