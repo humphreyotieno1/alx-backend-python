@@ -1,0 +1,83 @@
+2025-06-10 22:04:14,316 - User: Banta - Path: / - Method: GET
+2025-06-10 22:04:14,363 - Not Found: /
+2025-06-10 22:04:31,559 - User: Banta - Path: /admin/ - Method: GET
+2025-06-10 22:05:12,528 - User: Banta - Path: /admin/chats/conversation/add/ - Method: GET
+2025-06-10 22:05:12,717 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:05:25,885 - User: Banta - Path: /admin/chats/conversation/add/ - Method: POST
+2025-06-10 22:05:25,990 - User: Banta - Path: /admin/chats/conversation/ - Method: GET
+2025-06-10 22:05:26,660 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:05:33,356 - User: Banta - Path: /admin/chats/conversation/ - Method: GET
+2025-06-10 22:05:33,597 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:06:03,174 - User: Banta - Path: /admin/chats/user/ - Method: GET
+2025-06-10 22:06:03,316 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:06:06,854 - User: Banta - Path: /admin/chats/user/add/ - Method: GET
+2025-06-10 22:06:07,292 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:06:31,387 - User: Banta - Path: /admin/chats/user/add/ - Method: POST
+2025-06-10 22:06:34,297 - User: Banta - Path: /admin/chats/user/964c2aff-889a-4e7e-8d57-d7e867e97cac/change/ - Method: GET
+2025-06-10 22:06:34,907 - Internal Server Error: /admin/chats/user/964c2aff-889a-4e7e-8d57-d7e867e97cac/change/
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\options.py", line 840, in get_form
+    return modelform_factory(self.model, **defaults)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\forms\models.py", line 654, in modelform_factory
+    return type(form)(class_name, (form,), form_class_attrs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\forms\models.py", line 312, in __new__
+    fields = fields_for_model(
+        opts.model,
+    ...<11 lines>...
+        form_declared_fields=new_class.declared_fields,
+    )
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\forms\models.py", line 207, in fields_for_model
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: 'date_joined' cannot be specified for User model form as it is a non-editable field
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\options.py", line 719, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\sites.py", line 246, in inner
+    return view(request, *args, **kwargs)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\options.py", line 1987, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\utils\decorators.py", line 192, in _view_wrapper
+    result = _process_exception(request, e)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\utils\decorators.py", line 190, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\options.py", line 1840, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\options.py", line 1878, in _changeform_view
+    ModelForm = self.get_form(
+        request, obj, change=not add, fields=flatten_fieldsets(fieldsets)
+    )
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\auth\admin.py", line 98, in get_form
+    return super().get_form(request, obj, **defaults)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\PROJECTS\alx-backend-python\Django-Middleware-0x03\venv\Lib\site-packages\django\contrib\admin\options.py", line 842, in get_form
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: 'date_joined' cannot be specified for User model form as it is a non-editable field. Check fields/fieldsets/exclude attributes of class CustomUserAdmin.
+2025-06-10 22:06:42,182 - User: Banta - Path: /admin/chats/user/add/ - Method: GET
+2025-06-10 22:06:47,628 - User: Banta - Path: /admin/chats/user/ - Method: GET
+2025-06-10 22:06:47,860 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:06:59,080 - User: Banta - Path: /admin/account/emailaddress/ - Method: GET
+2025-06-10 22:06:59,184 - User: Banta - Path: /admin/jsi18n/ - Method: GET
+2025-06-10 22:07:01,813 - User: Banta - Path: /admin/authtoken/tokenproxy/ - Method: GET
