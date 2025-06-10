@@ -1,11 +1,11 @@
 from rest_framework import viewsets, status, filters, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Conversation, Message, User
 from .serializers import ConversationCreateSerializer, MessageSerializer, UserSerializer
-from .permissions import IsParticipant, IsMessageOwner, IsOwnerOrReadOnly
+from .permissions import IsParticipant, IsMessageOwner, IsOwnerOrReadOnly, IsParticipantOfConversation
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -25,10 +25,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationCreateSerializer
-    permission_classes = [IsAuthenticated, IsParticipant]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    permission_classes = [IsAuthenticated, IsParticipantOfConversation]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['title', 'participants__username']
     ordering_fields = ['created_at', 'updated_at']
+    filterset_fields = ['participants']
     
     def get_queryset(self):
         # Users can only see conversations they are part of
@@ -70,7 +71,19 @@ class MessageViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['content']
     ordering_fields = ['timestamp']
-    filterset_fields = ['conversation', 'sender']
+    filterset_fields = ['conversation', 'sender', 'is_read']
+    
+    def get_queryset(self):
+        # Only show messages from conversations the user is a participant of
+        return Message.objects.filter(conversation__participants=self.request.user)
+    
+    def perform_create(self, serializer):
+        # Automatically set the sender to the current user
+        serializer.save(sender=self.request.user)
+        
+        # Update the conversation's updated_at timestamp
+        conversation = serializer.validated_data['conversation']
+        conversation.save()
     
     def get_queryset(self):
         # Users can only see messages from conversations they are part of
