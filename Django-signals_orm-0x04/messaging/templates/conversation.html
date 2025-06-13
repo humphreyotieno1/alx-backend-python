@@ -12,6 +12,9 @@
                         <div class="message-content">
                             <p>{{ message.content }}</p>
                             <small>{{ message.timestamp }}</small>
+                            {% if message.edited %}
+                            <a href="{% url 'message_history' message.id %}" class="btn btn-sm btn-info">View Edit History</a>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

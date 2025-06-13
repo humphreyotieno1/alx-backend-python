@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2>Message History</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    Current Message
+                </div>
+                <div class="card-body">
+                    <p><strong>Content:</strong> {{ message.content }}</p>
+                    <p><strong>Sender:</strong> {{ message.sender.username }}</p>
+                    <p><strong>Receiver:</strong> {{ message.receiver.username }}</p>
+                    <p><strong>Timestamp:</strong> {{ message.timestamp }}</p>
+                </div>
+            </div>
+
+            {% if history %}
+            <div class="card">
+                <div class="card-header">
+                    Edit History
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for edit in history %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Edit by {{ edit.edited_by.username }}</h5>
+                                <small>{{ edit.edited_at }}</small>
+                            </div>
+                            <p class="mb-1">Previous content:</p>
+                            <p class="mb-1">"{{ edit.old_content }}"</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No edit history found for this message.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
