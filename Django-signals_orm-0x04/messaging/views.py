@@ -33,17 +33,23 @@ def conversation_view(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
     
     # Get all messages between the two users with optimized queries
-    messages = Message.objects.filter(
+    messages = (
+    Message.objects.filter(
         Q(sender=request.user, receiver=other_user) | 
         Q(sender=other_user, receiver=request.user)
-    ).select_related('sender', 'receiver', 'parent_message').prefetch_related('history').order_by('timestamp')
+    ).select_related('sender', 'receiver', 'parent_message')
+    .prefetch_related('history')
+    .only('id', 'sender', 'receiver', 'content', 'timestamp', 'edited', 'read', 'parent_message')
+    .order_by('timestamp')
+)
     
     # Mark messages as read if they were sent to the current user
     unread_messages = messages.filter(receiver=request.user, read=False)
     unread_messages.update(read=True)
     
     # Get unread messages for the user
-    unread_messages = Message.unread.unread_for_user(request.user)
+    unread_messages = Message.unread.unread_for_user(request.user).only(
+    'id', 'sender', 'receiver', 'content', 'timestamp', 'edited', 'read')
     
     context = {
         'messages': messages,
