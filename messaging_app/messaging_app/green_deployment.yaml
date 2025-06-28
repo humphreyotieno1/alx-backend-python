@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-messaging-app-green
+  labels:
+    app: django-messaging-green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-messaging-green
+  template:
+    metadata:
+      labels:
+        app: django-messaging-green
+        version: "green"
+    spec:
+      containers:
+      - name: django-app
+        image: messaging-app:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DJANGO_SETTINGS_MODULE
+          value: messaging_app.settings
+        - name: DEBUG
+          value: "False"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
