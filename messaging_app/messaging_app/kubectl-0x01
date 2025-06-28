@@ -1,0 +1,29 @@
+#!/bin/bash
+# kubectl-0x01 - Script to scale the Django app and monitor resources
+
+# Scale the deployment to 3 replicas
+echo "Scaling django-messaging-app deployment to 3 replicas..."
+kubectl scale deployment django-messaging-app --replicas=3
+
+# Verify the pods are running
+echo -e "\nChecking pod status:"
+kubectl get pods -l app=django-messaging
+
+# Monitor resource usage
+echo -e "\nResource usage:"
+kubectl top pods -l app=django-messaging
+
+# Install wrk if not installed
+if ! command -v wrk &> /dev/null; then
+    echo -e "\nInstalling wrk for load testing..."
+    sudo apt-get update && sudo apt-get install -y wrk
+fi
+
+# Get the service URL
+SERVICE_URL=$(minikube service django-service --url)
+echo -e "\nRunning load test on $SERVICE_URL..."
+
+# Run wrk for 30 seconds with 2 threads and 10 connections
+wrk -t2 -c10 -d30s $SERVICE_URL
+
+echo -e "\nLoad test complete!"

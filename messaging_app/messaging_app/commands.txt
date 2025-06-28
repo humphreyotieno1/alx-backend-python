@@ -1,0 +1,14 @@
+# Install the Nginx Ingress Controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for the ingress-nginx-controller pod to be ready
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=120s
+
+# Apply the Ingress configuration
+kubectl apply -f ingress.yaml
+
+# Add hosts entry (run on host machine)
+sudo echo "$(minikube ip) django-app.local api.django-app.local" | sudo tee -a /etc/hosts

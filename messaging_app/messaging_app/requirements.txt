@@ -5,3 +5,11 @@ django-cors-headers
 drf-yasg
 celery
 django-environ 
+dj-rest-auth
+django-allauth
+django-filter
+djangorestframework-simplejwt
+Pillow
+python-dotenv
+drf-nested-routers
+requests

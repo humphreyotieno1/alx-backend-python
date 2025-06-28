@@ -1,0 +1,31 @@
+#!/bin/bash
+# kubectl-0x02 - Script for blue-green deployment
+
+# Apply blue deployment
+echo "Deploying blue version..."
+kubectl apply -f blue_deployment.yaml
+
+# Wait for blue pods to be ready
+echo -e "\nWaiting for blue pods to be ready..."
+kubectl wait --for=condition=ready pod -l app=django-messaging --timeout=120s
+
+# Apply green deployment
+echo -e "\nDeploying green version..."
+kubectl apply -f green_deployment.yaml
+
+# Wait for green pods to be ready
+echo -e "\nWaiting for green pods to be ready..."
+kubectl wait --for=condition=ready pod -l app=django-messaging-green --timeout=120s
+
+# Check logs for errors in green deployment
+echo -e "\nChecking logs for green deployment..."
+GREEN_POD=$(kubectl get pods -l app=django-messaging-green -o jsonpath="{.items[0].metadata.name}")
+kubectl logs $GREEN_POD
+
+# Switch traffic to green
+echo -e "\nSwitching traffic to green deployment..."
+kubectl patch service django-service -p '{"spec":{"selector":{"app":"django-messaging-green"}}}'
+
+echo -e "\nBlue-green deployment complete!"
+echo "Current service selector:"
+kubectl get svc django-service -o jsonpath="{.spec.selector}" | jq .
