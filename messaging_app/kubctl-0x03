@@ -1,0 +1,39 @@
+#!/bin/bash
+# kubectl-0x03 - Script for performing rolling updates
+
+kubectl set image deployment/django-messaging-app django-app=messaging-app:latest
+
+# Monitor the rollout status
+echo "Monitoring rollout status..."
+kubectl rollout status deployment/django-messaging-app
+
+# Function to continuously test the service
+test_service() {
+    local url="http://$(minikube ip):$(kubectl get svc django-service -o jsonpath='{.spec.ports[0].nodePort}')"
+    echo "Testing service at $url"
+    
+    while true; do
+        if curl -s --head --request GET $url | grep "200 OK" > /dev/null; then
+            echo "$(date) - Service is up"
+        else
+            echo "$(date) - Service is down!"
+        fi
+        sleep 1
+    done
+}
+
+# Run the test in the background
+test_service &
+TEST_PID=$!
+
+# Wait for the rollout to complete
+kubectl rollout status deployment/django-messaging-app --timeout=300s
+
+# Stop the test
+kill $TEST_PID
+
+# Verify the update
+echo -e "\nVerifying the update..."
+kubectl get pods -l app=django-messaging -o wide
+
+echo -e "\nRolling update complete!"
