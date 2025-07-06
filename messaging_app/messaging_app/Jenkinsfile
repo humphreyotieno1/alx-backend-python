@@ -18,7 +18,7 @@ pipeline {
             steps {
                 git branch: 'main', 
                     credentialsId: 'github-credentials',
-                    url: 'https://github.com/humphreyotieno1/alx-backend-python/tree/main/messaging_app'
+                    url: 'https://github.com/humphreyotieno1/alx-backend-python.git'
             }
         }
 
@@ -27,7 +27,7 @@ pipeline {
                 sh '''
                 python -m venv venv
                 . venv/bin/activate
-                pip3 install -r requirements.txt
+                pip3 install -r messaging_app/requirements.txt
                 pip3 install pytest pytest-django pytest-cov flake8
                 '''
             }
