@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: messaging-app-config
+data:
+  DEBUG: "0"
+  DJANGO_SETTINGS_MODULE: "messaging_app.settings"
+  ALLOWED_HOSTS: "*"
+  DB_ENGINE: "django.db.backends.mysql"
+  DB_NAME: "messaging_db"
+  DB_USER: "messaging_user"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+  EMAIL_BACKEND: "django.core.mail.backends.console.EmailBackend"
+  DEFAULT_FROM_EMAIL: "webmaster@example.com"

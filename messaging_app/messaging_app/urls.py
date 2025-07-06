@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from . import health
 
 # Admin site configuration
 admin.site.site_header = 'Messaging App Administration'
@@ -16,6 +17,9 @@ admin.site.index_title = 'Admin'
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
+    
+    # Health check
+    path('health/', health.health_check, name='health_check'),
     
     # API
     path('api/', include('chats.urls')),

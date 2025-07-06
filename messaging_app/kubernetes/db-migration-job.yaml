@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+spec:
+  template:
+    spec:
+      containers:
+      - name: migration
+        image: your-dockerhub-username/messaging-app:latest
+        command: ["python", "manage.py", "migrate", "--noinput"]
+        envFrom:
+        - configMapRef:
+            name: messaging-app-config
+        - secretRef:
+            name: messaging-app-secrets
+      restartPolicy: Never
+  backoffLimit: 3

@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-messaging_db}
+      MYSQL_USER: ${DB_USER:-messaging_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-messaging_pass}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+
+  web:
+    build:
+      context: .
+      dockerfile: messaging_app/Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 messaging_app.wsgi:application"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME:-messaging_db}
+      - DB_USER=${DB_USER:-messaging_user}
+      - DB_PASSWORD=${DB_PASSWORD:-messaging_pass}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery:
+    build: .
+    command: >
+      sh -c "celery -A messaging_app worker --loglevel=info"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME:-messaging_db}
+      - DB_USER=${DB_USER:-messaging_user}
+      - DB_PASSWORD=${DB_PASSWORD:-messaging_pass}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build: .
+    command: >
+      sh -c "celery -A messaging_app beat --loglevel=info"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME:-messaging_db}
+      - DB_USER=${DB_USER:-messaging_user}
+      - DB_PASSWORD=${DB_PASSWORD:-messaging_pass}
+      - DB_HOST=db
+      - DB_PORT=3306
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  mysql_data:
+  redis_data:
